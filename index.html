@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Pasapalabra - David 18</title>
+<title>Pasapalabra Fiesta David 18</title>
 <style>
 body{font-family:Arial,sans-serif;margin:0;background:linear-gradient(135deg,#ff0080,#ff8c00);color:white;text-align:center;}
 h1{margin-top:10px;}
@@ -16,14 +16,16 @@ h1{margin-top:10px;}
 .activa{background:#ffe600;transform:scale(1.2);}
 .acierto{background:#2ecc71;color:white;}
 .error{background:#e74c3c;color:white;}
-#pregunta{font-size:22px;background:rgba(0,0,0,0.3);padding:20px;border-radius:10px;min-height:80px;}
+#pregunta{font-size:22px;background:rgba(0,0,0,0.3);padding:20px;border-radius:10px;min-height:80px;margin-bottom:10px;}
+#respuestaPantalla{font-size:20px;background:rgba(0,0,0,0.5);padding:10px;border-radius:10px;margin:10px;color:#fff;}
 button{padding:12px 20px;margin:5px;border:none;border-radius:8px;font-size:16px;cursor:pointer;}
 .ok{background:#2ecc71;color:white;}
 .fail{background:#e74c3c;color:white;}
 .pass{background:#f1c40f;color:black;}
 .start{background:#3498db;color:white;}
-input,select{padding:6px;margin:4px;}
-.config{background:rgba(0,0,0,0.25);padding:15px;border-radius:10px;margin-top:20px;}
+input,select,textarea{padding:6px;margin:4px;}
+.config{background:rgba(0,0,0,0.25);padding:15px;border-radius:10px;margin-top:20px;text-align:left;}
+.config div{margin-bottom:8px;}
 #timer{font-size:30px;margin:10px;font-weight:bold;}
 </style>
 </head>
@@ -38,7 +40,7 @@ input,select{padding:6px;margin:4px;}
 
 <div id="juego" class="tabcontent" style="display:block">
 <div>
-Tiempo de juego (segundos)
+Tiempo de juego (segundos):
 <input id="tiempo" type="number" value="180">
 <button class="start" onclick="iniciar()">Empezar</button>
 </div>
@@ -46,37 +48,28 @@ Tiempo de juego (segundos)
 <div id="timer"></div>
 <div id="rosco"></div>
 <div id="pregunta"></div>
+<div id="respuestaPantalla"></div>
 <div>
-<button class="ok" onclick="acierto()">Acierto</button>
-<button class="fail" onclick="error()">Error</button>
+<button class="ok" onclick="marcar('acierto')">Acierto</button>
+<button class="fail" onclick="marcar('error')">Error</button>
 <button class="pass" onclick="pasapalabra()">Pasapalabra</button>
 </div>
 </div>
 
 <div id="config" class="tabcontent">
-<h2>Preguntas preconfiguradas / Editar</h2>
-Letra<select id="letra"></select>
-Tipo<select id="tipo">
-<option value="empieza">Empieza por</option>
-<option value="contiene">Contiene</option>
-</select>
-Respuesta<input id="respuesta">
-Pista<input id="pista" style="width:300px">
-<button onclick="agregar()">Añadir</button>
-<div id="lista"></div>
+<h2>Configuración de preguntas</h2>
+<div id="configuracionLetra"></div>
 </div>
 
 </div>
 
 <script>
-const letras="ABCDEFGHIJKLMNÑOPQRSTUVWXYZ".split("")
-let preguntas=[],indice=0,tiempo=0,intervalo
+const letras="ABCDEFGHIJKLMNÑOPQRSTUVWXYZ".split("");
+let preguntas=[],indice=0,tiempo=0,intervalo;
 
-function init(){
-const sel=document.getElementById("letra")
-letras.forEach(l=>{let o=document.createElement("option");o.text=l;sel.add(o)})
-// Preconfigurado
-preguntas=[
+// Preguntas preconfiguradas
+function cargarPreguntas(){
+  preguntas=[
 {letra:"A",tipo:"empieza",respuesta:"Ahorrar",pista:"Lo que prometes hacer con el dinero… pero nunca haces."},
 {letra:"B",tipo:"contiene",respuesta:"Bizum",pista:"Aplicación que te salva cuando te quedas sin efectivo."},
 {letra:"C",tipo:"empieza",respuesta:"Coche",pista:"Medio de transporte que quieres tener a los 18."},
@@ -93,97 +86,121 @@ preguntas=[
 {letra:"N",tipo:"empieza",respuesta:"Niño",pista:"Lo que dicen tus padres que sigues siendo."},
 {letra:"Ñ",tipo:"empieza",respuesta:"Enseñar",pista:"Contiene la Ñ: acción de transmitir conocimientos."},
 {letra:"O",tipo:"empieza",respuesta:"Ocio",pista:"Tiempo libre fuera de trabajo o estudios."},
-{letra:"P",tipo:"empieza",respuesta:"Pintas",pista:"Lo que prometes que será 'solo una más y nos vamos'."},
+{letra:"P",tipo:"empieza",respuesta:"Pintas",pista:"Lo que prometes que será 'solo uno'."},
 {letra:"Q",tipo:"empieza",respuesta:"Quejarte",pista:"Lo que haces cuando algo no te gusta."},
 {letra:"R",tipo:"empieza",respuesta:"Responsabilidad",pista:"Capacidad de asumir obligaciones."},
 {letra:"S",tipo:"empieza",respuesta:"Ser responsable",pista:"Lo que prometes hacer mañana."},
 {letra:"T",tipo:"empieza",respuesta:"Trabajo",pista:"Actividad remunerada que realizas."},
-{letra:"U",tipo:"empieza",respuesta:"Universidad",pista:"Lugar donde muchos dicen que van a estudiar.. pero van a jugar al mus y también a salir."},
+{letra:"U",tipo:"empieza",respuesta:"Universidad",pista:"Lugar donde muchos dicen que van a estudiar… y también a salir."},
 {letra:"V",tipo:"empieza",respuesta:"Votar",pista:"Derecho político al cumplir 18 años."},
 {letra:"W",tipo:"empieza",respuesta:"Wifi",pista:"Lo que preguntas cuando no hay datos."},
 {letra:"X",tipo:"contiene",respuesta:"Excusa",pista:"Contiene la X: explicación cuando te equivocas."},
 {letra:"Y",tipo:"empieza",respuesta:"Y",pista:"Conjunción que une palabras."},
 {letra:"Z",tipo:"empieza",respuesta:"Zombie",pista:"En lo que te conviertes después de la fiesta."}
-]
-renderLista()
-crearRosco()
+];
 }
+
+function init(){
+cargarPreguntas();
+crearRosco();
+crearConfig();
+}
+
+// Pestañas
 function abrirTab(id){
-document.querySelectorAll(".tabcontent").forEach(t=>t.style.display="none")
-document.querySelectorAll(".tab").forEach(tb=>tb.classList.remove("active"))
-document.getElementById(id).style.display="block"
-event.currentTarget.classList.add("active")
+document.querySelectorAll(".tabcontent").forEach(t=>t.style.display="none");
+document.querySelectorAll(".tab").forEach(tb=>tb.classList.remove("active"));
+document.getElementById(id).style.display="block";
+event.currentTarget.classList.add("active");
 }
+
+// Rosco
 function crearRosco(){
-const rosco=document.getElementById("rosco")
-rosco.innerHTML=""
-const radio=230,centro=260
+const rosco=document.getElementById("rosco");rosco.innerHTML="";
+const radio=230,centro=260;
 letras.forEach((l,i)=>{
-const angulo=(i/letras.length)*2*Math.PI
-const x=centro+radio*Math.cos(angulo)-20
-const y=centro+radio*Math.sin(angulo)-20
-const div=document.createElement("div")
-div.className="letra";div.id="l"+i;div.innerText=l
-div.style.left=x+"px";div.style.top=y+"px"
-rosco.appendChild(div)
-})
+const angulo=(i/letras.length)*2*Math.PI;
+const x=centro+radio*Math.cos(angulo)-20;
+const y=centro+radio*Math.sin(angulo)-20;
+const div=document.createElement("div");
+div.className="letra";div.id="l"+i;div.innerText=l;
+div.style.left=x+"px";div.style.top=y+"px";
+rosco.appendChild(div);
+});
 }
-function hablar(texto){
-const msg=new SpeechSynthesisUtterance(texto)
-msg.lang="es-ES"
-speechSynthesis.speak(msg)
-}
+
+// Voz
+function hablar(texto){const msg=new SpeechSynthesisUtterance(texto);msg.lang="es-ES";speechSynthesis.speak(msg);}
+
+// Juego
 function iniciar(){
-indice=0
-let cuenta=10
-document.getElementById("cuenta").innerText="Empieza en "+cuenta
+indice=0;
+let cuenta=10;document.getElementById("cuenta").innerText="Empieza en "+cuenta;
 const countdown=setInterval(()=>{
-cuenta--
-document.getElementById("cuenta").innerText="Empieza en "+cuenta
-if(cuenta==0){clearInterval(countdown);document.getElementById("cuenta").innerText="";comenzar()}
-},1000)
+cuenta--;document.getElementById("cuenta").innerText="Empieza en "+cuenta;
+if(cuenta==0){clearInterval(countdown);document.getElementById("cuenta").innerText="";comenzar();}
+},1000);
 }
 function comenzar(){
-tiempo=parseInt(document.getElementById("tiempo").value)
-document.getElementById("timer").innerText=tiempo
-intervalo=setInterval(()=>{
-tiempo--;document.getElementById("timer").innerText=tiempo
-if(tiempo<=0){clearInterval(intervalo);alert("Tiempo terminado")}
-},1000)
-mostrarPregunta()
+tiempo=parseInt(document.getElementById("tiempo").value);
+document.getElementById("timer").innerText=tiempo;
+intervalo=setInterval(()=>{tiempo--;document.getElementById("timer").innerText=tiempo;if(tiempo<=0){clearInterval(intervalo);alert("Tiempo terminado");}},1000);
+mostrarPregunta();
 }
-function obtenerPregunta(letra){return preguntas.find(p=>p.letra==letra)}
+function obtenerPregunta(letra){return preguntas.find(p=>p.letra==letra);}
 function mostrarPregunta(){
-document.querySelectorAll(".letra").forEach(l=>l.classList.remove("activa"))
-document.getElementById("l"+indice).classList.add("activa")
-const letra=letras[indice]
-const q=obtenerPregunta(letra)
-if(!q){document.getElementById("pregunta").innerText="No hay pregunta para "+letra;hablar("Letra "+letra);return}
-const texto=(q.tipo=="empieza"?"Empieza por ":"Contiene la letra ")+letra+". "+q.pista
-document.getElementById("pregunta").innerText=texto
-hablar("Letra "+letra+". "+texto)
+document.querySelectorAll(".letra").forEach(l=>l.classList.remove("activa"));
+document.getElementById("l"+indice).classList.add("activa");
+const letra=letras[indice];
+const q=obtenerPregunta(letra);
+if(!q){document.getElementById("pregunta").innerText="No hay pregunta para "+letra;hablar("Letra "+letra);return;}
+const texto=(q.tipo=="empieza"?"Empieza por ":"Contiene la letra ")+letra+". "+q.pista;
+document.getElementById("pregunta").innerText=texto;
+hablar("Letra "+letra+". "+texto);
+document.getElementById("respuestaPantalla").innerText="";
 }
-function siguiente(){indice++;if(indice>=letras.length) indice=0;mostrarPregunta()}
-function acierto(){document.getElementById("l"+indice).classList.add("acierto");siguiente()}
-function error(){document.getElementById("l"+indice).classList.add("error");siguiente()}
-function pasapalabra(){siguiente()}
-function agregar(){
-const letra=document.getElementById("letra").value
-const tipo=document.getElementById("tipo").value
-const respuesta=document.getElementById("respuesta").value
-const pista=document.getElementById("pista").value
-preguntas.push({letra,tipo,respuesta,pista})
-renderLista()
+function siguiente(){indice++;if(indice>=letras.length) indice=0;mostrarPregunta();}
+function marcar(tipo){
+const letra=letras[indice];const q=obtenerPregunta(letra);
+document.getElementById("respuestaPantalla").innerText="Respuesta: "+(q?q.respuesta:"N/A");
+if(tipo=="acierto"){document.getElementById("l"+indice).classList.add("acierto");}else if(tipo=="error"){document.getElementById("l"+indice).classList.add("error");}
+setTimeout(siguiente,1500);
 }
-function renderLista(){
-const div=document.getElementById("lista");div.innerHTML=""
-preguntas.forEach((p,i)=>{
-const row=document.createElement("div")
-row.innerText=p.letra+" | "+p.tipo+" | "+p.pista+" → "+p.respuesta
-div.appendChild(row)
-})
+function pasapalabra(){siguiente();}
+
+// Configuración
+function crearConfig(){
+const div=document.getElementById("configuracionLetra");div.innerHTML="";
+letras.forEach((l,i)=>{
+const q=obtenerPregunta(l) || {letra:l,tipo:"empieza",pista:"",respuesta:""};
+const fila=document.createElement("div");
+fila.innerHTML=`<b>${l}</b> Tipo:
+<select id="tipo${l}"><option value="empieza">Empieza por</option><option value="contiene">Contiene</option></select>
+Pista:<input id="pista${l}" value="${q.pista}" style="width:250px">
+Respuesta:<input id="resp${l}" value="${q.respuesta}">
+<button onclick="guardar('${l}')">Guardar</button>
+<button onclick="eliminar('${l}')">Eliminar</button>`;
+div.appendChild(fila);
+document.getElementById("tipo"+l).value=q.tipo;
+});
 }
-init()
+
+function guardar(letra){
+const q=obtenerPregunta(letra);
+const tipo=document.getElementById("tipo"+letra).value;
+const pista=document.getElementById("pista"+letra).value;
+const respuesta=document.getElementById("resp"+letra).value;
+if(q){q.tipo=tipo;q.pista=pista;q.respuesta=respuesta;}
+else{preguntas.push({letra,tipo,respuesta,pista});}
+crearRosco();crearConfig();
+}
+
+function eliminar(letra){
+preguntas=preguntas.filter(p=>p.letra!==letra);
+crearRosco();crearConfig();
+}
+
+init();
 </script>
 </body>
 </html>
