@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Pasapalabra - David 18</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:linear-gradient(135deg,#ff0080,#ff8c00);
+color:white;
+text-align:center;
+margin:0;
+}
+
+h1{
+margin-top:10px;
+}
+
+.container{
+max-width:1000px;
+margin:auto;
+padding:20px;
+}
+
+#rosco{
+position:relative;
+width:450px;
+height:450px;
+margin:20px auto;
+}
+
+.letra{
+position:absolute;
+width:40px;
+height:40px;
+border-radius:50%;
+background:white;
+color:black;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+}
+
+.activa{
+background:yellow;
+}
+
+.acierto{
+background:#2ecc71;
+color:white;
+}
+
+.error{
+background:#e74c3c;
+color:white;
+}
+
+#pregunta{
+font-size:22px;
+margin:30px;
+min-height:80px;
+}
+
+button{
+padding:12px 20px;
+margin:5px;
+border:none;
+border-radius:6px;
+font-size:16px;
+cursor:pointer;
+}
+
+.start{background:#3498db;color:white}
+.ok{background:#2ecc71;color:white}
+.fail{background:#e74c3c;color:white}
+.pass{background:#f1c40f;color:black}
+
+input{
+padding:6px;
+font-size:16px;
+}
+
+#timer{
+font-size:28px;
+margin:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🎉 Fiesta cumpleaños David 18 años 🎉</h1>
+
+<div>
+Tiempo de juego (segundos):
+<input id="tiempo" type="number" value="180">
+<button class="start" onclick="iniciar()">Empezar</button>
+</div>
+
+<div id="cuenta"></div>
+
+<div id="timer"></div>
+
+<div id="rosco"></div>
+
+<div id="pregunta"></div>
+
+<div>
+<button class="ok" onclick="acierto()">Acierto</button>
+<button class="fail" onclick="error()">Error</button>
+<button class="pass" onclick="pasapalabra()">Pasapalabra</button>
+</div>
+
+</div>
+
+<script>
+
+const preguntasOriginal = [
+
+{letra:"A",p:"Lo que prometes hacer con el dinero… pero nunca haces.",r:"Ahorrar"},
+{letra:"B",p:"Aplicación que te salva cuando te quedas sin efectivo.",r:"Bizum"},
+{letra:"C",p:"Medio de transporte que quieres tener a los 18.",r:"Coche"},
+{letra:"D",p:"Documento nacional de identidad.",r:"DNI"},
+{letra:"E",p:"Lo que dicen tus padres que debes tener ahora.",r:"Educación"},
+{letra:"F",p:"Lo que haces los fines de semana.",r:"Fiesta"},
+{letra:"G",p:"Personas con las que sales los fines de semana.",r:"Grupo"},
+{letra:"H",p:"Lo que necesitas para organizar tu día.",r:"Horario"},
+{letra:"I",p:"Lo que quieres tener cuando cumples 18.",r:"Independencia"},
+{letra:"J",p:"Lo que algunos montan después de tres copas.",r:"Juerga"},
+{letra:"K",p:"Letra que usas cuando escribes 'k pasa'.",r:"K"},
+{letra:"L",p:"Lo que sube cuando enciendes muchas cosas en casa.",r:"Luz"},
+{letra:"M",p:"Lo que te queda después de una gran fiesta.",r:"Mareo"},
+{letra:"N",p:"Lo que dicen tus padres que sigues siendo.",r:"Niño"},
+{letra:"Ñ",p:"Contiene la Ñ: acción de transmitir conocimientos.",r:"Enseñar"},
+{letra:"O",p:"Tiempo libre fuera de trabajo o estudios.",r:"Ocio"},
+{letra:"P",p:"Lo que prometes que será 'solo uno'.",r:"Pintas"},
+{letra:"Q",p:"Lo que haces cuando algo no te gusta.",r:"Quejarte"},
+{letra:"R",p:"Capacidad de asumir obligaciones.",r:"Responsabilidad"},
+{letra:"S",p:"Lo que prometes hacer mañana.",r:"Ser responsable"},
+{letra:"T",p:"Actividad remunerada que realizas.",r:"Trabajo"},
+{letra:"U",p:"Lugar donde muchos dicen que van a estudiar… y también a salir.",r:"Universidad"},
+{letra:"V",p:"Derecho político al cumplir 18 años.",r:"Votar"},
+{letra:"W",p:"Lo que preguntas cuando no hay datos.",r:"Wifi"},
+{letra:"X",p:"Contiene la X: explicación cuando te equivocas.",r:"Excusa"},
+{letra:"Y",p:"Conjunción que une palabras.",r:"Y"},
+{letra:"Z",p:"En lo que te conviertes después de la fiesta.",r:"Zombie"}
+
+]
+
+let preguntas=[]
+let indice=0
+let tiempo=0
+let intervalo
+
+function crearRosco(){
+
+const rosco=document.getElementById("rosco")
+rosco.innerHTML=""
+
+const total=preguntas.length
+const radio=200
+const centro=225
+
+preguntas.forEach((p,i)=>{
+
+const angulo=(i/total)*2*Math.PI
+
+const x=centro+radio*Math.cos(angulo)-20
+const y=centro+radio*Math.sin(angulo)-20
+
+const div=document.createElement("div")
+div.className="letra"
+div.id="l"+i
+div.style.left=x+"px"
+div.style.top=y+"px"
+div.innerText=p.letra
+
+rosco.appendChild(div)
+
+})
+
+}
+
+function iniciar(){
+
+preguntas=[...preguntasOriginal].sort(()=>Math.random()-0.5)
+
+crearRosco()
+
+indice=0
+
+let cuenta=10
+
+document.getElementById("cuenta").innerText="Empieza en "+cuenta
+
+const countdown=setInterval(()=>{
+
+cuenta--
+
+document.getElementById("cuenta").innerText="Empieza en "+cuenta
+
+if(cuenta==0){
+
+clearInterval(countdown)
+document.getElementById("cuenta").innerText=""
+comenzarJuego()
+
+}
+
+},1000)
+
+}
+
+function comenzarJuego(){
+
+tiempo=parseInt(document.getElementById("tiempo").value)
+
+document.getElementById("timer").innerText=tiempo
+
+intervalo=setInterval(()=>{
+
+tiempo--
+
+document.getElementById("timer").innerText=tiempo
+
+if(tiempo<=0){
+clearInterval(intervalo)
+alert("Tiempo terminado")
+}
+
+},1000)
+
+mostrarPregunta()
+
+}
+
+function mostrarPregunta(){
+
+document.querySelectorAll(".letra").forEach(l=>l.classList.remove("activa"))
+
+document.getElementById("l"+indice).classList.add("activa")
+
+document.getElementById("pregunta").innerText=
+preguntas[indice].letra+" → "+preguntas[indice].p
+
+}
+
+function siguiente(){
+
+indice++
+
+if(indice>=preguntas.length) indice=0
+
+mostrarPregunta()
+
+}
+
+function acierto(){
+
+document.getElementById("l"+indice).classList.add("acierto")
+siguiente()
+
+}
+
+function error(){
+
+document.getElementById("l"+indice).classList.add("error")
+siguiente()
+
+}
+
+function pasapalabra(){
+
+siguiente()
+
+}
+
+crearRosco()
+
+</script>
+
+</body>
+</html>
