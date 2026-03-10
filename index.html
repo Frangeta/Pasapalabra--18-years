@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Pasapalabra – Fiesta David 18 🎉</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root {
     --gold: #FFD700;
@@ -407,6 +408,41 @@
     margin-top: -10px;
   }
 
+  /* ── Excel toolbar ── */
+  .excel-toolbar {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 18px; align-items: center;
+  }
+  .btn-excel {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 10px 20px; border-radius: 12px; border: none;
+    font-family: 'Nunito', sans-serif; font-weight: 800;
+    font-size: clamp(0.82rem, 2.2vw, 0.95rem);
+    cursor: pointer; transition: all 0.2s; min-height: 44px;
+    white-space: nowrap;
+  }
+  .btn-excel:active { transform: scale(0.96); }
+  .btn-excel-dl {
+    background: linear-gradient(135deg, #1D6F42, #2ea05a);
+    color: #fff; box-shadow: 0 4px 16px rgba(30,111,66,0.4);
+  }
+  .btn-excel-up {
+    background: linear-gradient(135deg, #1565C0, #2979FF);
+    color: #fff; box-shadow: 0 4px 16px rgba(41,121,255,0.4);
+  }
+  .upload-hint {
+    font-size: 0.78rem; color: rgba(255,255,255,0.4);
+    margin-top: 2px; line-height: 1.4;
+  }
+  .import-status {
+    display: none; padding: 10px 16px; border-radius: 10px;
+    font-weight: 700; font-size: 0.88rem; margin-bottom: 12px;
+    animation: fadeIn 0.3s ease;
+  }
+  .import-status.ok  { display:block; background: rgba(0,230,118,0.15); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
+  .import-status.err { display:block; background: rgba(255,23,68,0.15);  color: var(--red);   border: 1px solid rgba(255,23,68,0.3); }
+  #fileInput { display: none; }
+
   /* ── Ajustes específicos para pantallas pequeñas ── */
   @media (max-width: 400px) {
     .btn { padding: 11px 12px; gap: 4px; }
@@ -534,6 +570,25 @@
   <div id="config" class="panel">
     <div class="config-panel">
       <h2>⚙️ Configuración de preguntas</h2>
+
+      <!-- Excel toolbar -->
+      <div class="excel-toolbar">
+        <button class="btn-excel btn-excel-dl" onclick="exportarExcel()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Descargar Excel
+        </button>
+
+        <div>
+          <button class="btn-excel btn-excel-up" onclick="document.getElementById('fileInput').click()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Subir Excel
+          </button>
+          <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="importarExcel(event)">
+          <div class="upload-hint">Columnas: Letra · Tipo (empieza/contiene) · Pista · Respuesta</div>
+        </div>
+      </div>
+
+      <div class="import-status" id="importStatus"></div>
       <div id="configuracionLetra"></div>
     </div>
   </div>
@@ -906,6 +961,100 @@ function resetGame() {
   document.querySelectorAll('.letra').forEach(l => l.className = 'letra');
   clearInterval(intervalo); juegoActivo = false;
   actualizarScoreboard();
+}
+
+// ── Excel Export ──────────────────────────────────────────────────────────────
+function exportarExcel() {
+  const datos = [
+    ["Letra", "Tipo", "Pista", "Respuesta"] // cabecera
+  ];
+  LETRAS.forEach(l => {
+    const q = obtenerPregunta(l) || { letra: l, tipo: 'empieza', pista: '', respuesta: '' };
+    datos.push([q.letra, q.tipo, q.pista, q.respuesta]);
+  });
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(datos);
+
+  // Ancho de columnas
+  ws['!cols'] = [{ wch: 8 }, { wch: 12 }, { wch: 55 }, { wch: 28 }];
+
+  // Estilo de cabecera (color verde Excel)
+  const headerStyle = {
+    font: { bold: true, color: { rgb: "FFFFFF" } },
+    fill: { fgColor: { rgb: "1D6F42" } },
+    alignment: { horizontal: "center" }
+  };
+  ["A1","B1","C1","D1"].forEach(cell => {
+    if (ws[cell]) ws[cell].s = headerStyle;
+  });
+
+  XLSX.utils.book_append_sheet(wb, ws, "Preguntas");
+  XLSX.writeFile(wb, "pasapalabra_preguntas.xlsx");
+}
+
+// ── Excel Import ──────────────────────────────────────────────────────────────
+function importarExcel(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const wb   = XLSX.read(data, { type: 'array' });
+      const ws   = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+
+      // Detectar si la primera fila es cabecera
+      const startRow = (rows[0] && rows[0][0] && rows[0][0].toString().toLowerCase() === 'letra') ? 1 : 0;
+      const importadas = [];
+      let errores = 0;
+
+      rows.slice(startRow).forEach(row => {
+        if (!row || row.length < 2) return;
+        const letra     = (row[0] || '').toString().trim().toUpperCase();
+        const tipo      = (row[1] || 'empieza').toString().trim().toLowerCase();
+        const pista     = (row[2] || '').toString().trim();
+        const respuesta = (row[3] || '').toString().trim();
+
+        if (!LETRAS.includes(letra)) { errores++; return; }
+        const tipoValido = ['empieza','contiene'].includes(tipo) ? tipo : 'empieza';
+        importadas.push({ letra, tipo: tipoValido, pista, respuesta });
+      });
+
+      if (importadas.length === 0) {
+        mostrarImportStatus('err', '❌ No se encontraron filas válidas. Comprueba el formato del archivo.');
+        return;
+      }
+
+      // Combinar: actualizar existentes, añadir nuevas
+      importadas.forEach(imp => {
+        const idx = preguntas.findIndex(p => p.letra === imp.letra);
+        if (idx >= 0) preguntas[idx] = imp;
+        else preguntas.push(imp);
+      });
+
+      crearConfig();
+      const msg = errores > 0
+        ? `✅ ${importadas.length} preguntas importadas. ⚠️ ${errores} filas ignoradas (letra no reconocida).`
+        : `✅ ${importadas.length} preguntas importadas correctamente.`;
+      mostrarImportStatus('ok', msg);
+
+    } catch(err) {
+      mostrarImportStatus('err', '❌ Error al leer el archivo: ' + err.message);
+    }
+    // Reset input para permitir subir el mismo archivo de nuevo
+    event.target.value = '';
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function mostrarImportStatus(tipo, msg) {
+  const el = document.getElementById('importStatus');
+  el.className = 'import-status ' + tipo;
+  el.textContent = msg;
+  setTimeout(() => el.className = 'import-status', 5000);
 }
 
 // ── Configuración ─────────────────────────────────────────────────────────────
