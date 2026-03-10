@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Pasapalabra – Fiesta David 18 🎉</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
@@ -18,9 +18,16 @@
     --glow-gold: 0 0 24px #FFD70088;
     --glow-green: 0 0 20px #00E67688;
     --glow-red: 0 0 20px #FF174488;
+
+    /* Tamaños base del rosco */
+    --rosco-size: min(480px, 88vw);
+    --letra-size: clamp(28px, 7.5vw, 42px);
+    --letra-font: clamp(0.55rem, 1.6vw, 0.82rem);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { font-size: 16px; }
 
   body {
     font-family: 'Nunito', sans-serif;
@@ -28,6 +35,8 @@
     color: #fff;
     min-height: 100vh;
     overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 
   /* ── Animated BG ── */
@@ -47,42 +56,47 @@
 
   .container {
     position: relative; z-index: 1;
-    max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px;
+    max-width: 900px; margin: 0 auto;
+    padding: 16px 12px 60px;
   }
 
   /* ── Header ── */
   header {
-    text-align: center; padding: 24px 0 10px;
+    text-align: center; padding: 16px 0 8px;
   }
   header h1 {
     font-family: 'Bebas Neue', cursive;
-    font-size: clamp(2.4rem, 7vw, 4.5rem);
+    font-size: clamp(2rem, 8vw, 4.5rem);
     letter-spacing: 4px;
     background: linear-gradient(135deg, var(--gold), var(--hot), #FF8C00);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    text-shadow: none;
     filter: drop-shadow(0 0 20px #FF2D7888);
     line-height: 1;
   }
-  header p {
-    color: rgba(255,255,255,0.5);
-    font-size: 0.95rem;
-    margin-top: 6px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+  header h2 {
+    font-size: clamp(0.75rem, 2.5vw, 1rem);
+    color: rgba(255,255,255,0.55);
+    margin-top: 4px;
+    font-weight: 700;
+    letter-spacing: 1px;
   }
 
   /* ── Tabs ── */
   .tabs {
-    display: flex; justify-content: center; gap: 10px; margin: 22px 0;
+    display: flex; justify-content: center; gap: 8px;
+    margin: 14px 0;
+    flex-wrap: wrap;
   }
   .tab-btn {
-    padding: 10px 28px; border: none; border-radius: 50px; cursor: pointer;
-    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.95rem;
+    padding: 9px 22px; border: none; border-radius: 50px; cursor: pointer;
+    font-family: 'Nunito', sans-serif; font-weight: 700;
+    font-size: clamp(0.8rem, 2.5vw, 0.95rem);
     background: var(--card); color: rgba(255,255,255,0.6);
     border: 1px solid rgba(255,255,255,0.1);
     transition: all 0.3s;
     backdrop-filter: blur(10px);
+    white-space: nowrap;
+    min-height: 44px; /* touch target */
   }
   .tab-btn.active {
     background: linear-gradient(135deg, var(--gold), var(--hot));
@@ -91,37 +105,35 @@
   }
 
   /* ── Game Panel ── */
-  .panel {
-    display: none;
-    animation: fadeIn 0.4s ease;
-  }
+  .panel { display: none; animation: fadeIn 0.4s ease; }
   .panel.active { display: block; }
   @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
 
   /* ── Scoreboard bar ── */
   .scoreboard {
-    display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;
-    margin-bottom: 20px;
+    display: flex; justify-content: center; gap: 10px;
+    flex-wrap: nowrap; /* en móvil queremos que quepan en una fila */
+    margin-bottom: 12px;
   }
   .score-pill {
-    display: flex; align-items: center; gap: 8px;
-    padding: 8px 20px; border-radius: 50px;
-    font-weight: 900; font-size: 1.1rem;
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 50px;
+    font-weight: 900; font-size: clamp(0.85rem, 2.5vw, 1.1rem);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255,255,255,0.12);
+    white-space: nowrap;
   }
   .score-pill.green { background: rgba(0,230,118,0.15); color: var(--green); box-shadow: var(--glow-green); }
   .score-pill.red   { background: rgba(255,23,68,0.15);  color: var(--red);   box-shadow: var(--glow-red); }
   .score-pill.yellow{ background: rgba(255,214,0,0.15);  color: var(--yellow);}
-  .score-pill .icon { font-size: 1.3rem; }
+  .score-pill .icon { font-size: clamp(1rem, 3vw, 1.3rem); }
 
   /* ── Timer ── */
-  .timer-wrap {
-    text-align: center; margin-bottom: 16px;
-  }
+  .timer-wrap { text-align: center; margin-bottom: 10px; }
   #timer {
     font-family: 'Bebas Neue', cursive;
-    font-size: 4rem; letter-spacing: 4px;
+    font-size: clamp(2.8rem, 9vw, 4rem);
+    letter-spacing: 4px;
     color: var(--gold);
     text-shadow: var(--glow-gold);
     display: inline-block;
@@ -133,61 +145,52 @@
   /* ── Rosco ── */
   #rosco {
     position: relative;
-    width: min(520px, 90vw); height: min(520px, 90vw);
-    margin: 0 auto 24px;
+    width: var(--rosco-size);
+    height: var(--rosco-size);
+    margin: 0 auto 16px;
+    /* Aseguramos que el rosco siempre tenga dimensiones cuando se calcula */
+    flex-shrink: 0;
   }
   .letra {
     position: absolute;
-    width: clamp(32px, 8vw, 44px); height: clamp(32px, 8vw, 44px);
+    width: var(--letra-size);
+    height: var(--letra-size);
     border-radius: 50%;
     background: rgba(255,255,255,0.12);
     border: 2px solid rgba(255,255,255,0.2);
     color: #fff; font-weight: 900;
-    font-size: clamp(0.65rem, 1.8vw, 0.85rem);
+    font-size: var(--letra-font);
     display: flex; align-items: center; justify-content: center;
     transition: all 0.35s cubic-bezier(.34,1.56,.64,1);
     cursor: default; user-select: none;
     backdrop-filter: blur(4px);
+    line-height: 1;
   }
   .letra.activa {
-    background: var(--gold);
-    color: var(--dark);
-    border-color: #fff;
-    transform: scale(1.35);
+    background: var(--gold); color: var(--dark);
+    border-color: #fff; transform: scale(1.35);
     box-shadow: var(--glow-gold), 0 0 0 4px rgba(255,215,0,0.3);
     animation: activePulse 1.2s ease-in-out infinite;
+    z-index: 2;
   }
   @keyframes activePulse {
     0%,100% { box-shadow: var(--glow-gold), 0 0 0 4px rgba(255,215,0,0.3); }
     50%      { box-shadow: 0 0 40px #FFD700cc, 0 0 0 8px rgba(255,215,0,0.15); }
   }
-  .letra.acierto {
-    background: var(--green); color: var(--dark);
-    border-color: #00E676; box-shadow: var(--glow-green);
-    transform: scale(1.15);
-  }
-  .letra.error {
-    background: var(--red); color: #fff;
-    border-color: #FF1744; box-shadow: var(--glow-red);
-    transform: scale(1.05);
-  }
-  .letra.pasada {
-    background: rgba(255,214,0,0.2);
-    border-color: var(--yellow);
-    color: var(--yellow);
-  }
+  .letra.acierto { background: var(--green); color: var(--dark); border-color: #00E676; box-shadow: var(--glow-green); transform: scale(1.15); }
+  .letra.error   { background: var(--red);   color: #fff;        border-color: #FF1744; box-shadow: var(--glow-red);   transform: scale(1.05); }
+  .letra.pasada  { background: rgba(255,214,0,0.2); border-color: var(--yellow); color: var(--yellow); }
 
   /* ── Question box ── */
   .question-box {
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.12);
     backdrop-filter: blur(16px);
-    border-radius: 20px;
-    padding: 22px 28px;
-    margin-bottom: 14px;
-    min-height: 90px;
-    position: relative;
-    overflow: hidden;
+    border-radius: 16px;
+    padding: 16px 20px 16px 24px;
+    margin-bottom: 10px;
+    min-height: 72px;
+    position: relative; overflow: hidden;
   }
   .question-box::before {
     content: '';
@@ -195,96 +198,88 @@
     width: 5px; height: 100%;
     background: linear-gradient(180deg, var(--gold), var(--hot));
   }
-  .letter-badge {
-    display: inline-block;
-    font-family: 'Bebas Neue', cursive;
-    font-size: 1.6rem;
-    color: var(--gold);
-    margin-right: 10px;
-    letter-spacing: 1px;
-  }
-  #pregunta {
-    font-size: clamp(1rem, 2.5vw, 1.25rem);
-    line-height: 1.5;
-    color: rgba(255,255,255,0.9);
-  }
   .tipo-badge {
     display: inline-block;
     padding: 2px 10px; border-radius: 50px;
-    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 1px; margin-right: 8px;
+    font-size: clamp(0.62rem, 1.8vw, 0.72rem);
+    font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    margin-right: 6px; margin-bottom: 4px;
     background: rgba(255,45,120,0.25); color: var(--hot);
     border: 1px solid rgba(255,45,120,0.4);
+    vertical-align: middle;
+  }
+  #pregunta {
+    font-size: clamp(0.9rem, 2.8vw, 1.15rem);
+    line-height: 1.5;
+    color: rgba(255,255,255,0.9);
   }
 
   /* ── Answer reveal ── */
   #respuestaPantalla {
     background: rgba(255,214,0,0.1);
     border: 1px solid rgba(255,214,0,0.3);
-    border-radius: 14px;
-    padding: 14px 22px;
-    font-size: 1.2rem; font-weight: 700;
-    color: var(--gold);
-    min-height: 54px;
-    margin-bottom: 16px;
-    display: flex; align-items: center; gap: 10px;
-    transition: all 0.4s;
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-size: clamp(0.95rem, 2.8vw, 1.15rem);
+    font-weight: 700; color: var(--gold);
+    min-height: 48px;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+    transition: opacity 0.4s;
+    word-break: break-word;
   }
-  #respuestaPantalla:empty { opacity: 0; }
+  #respuestaPantalla:empty { opacity: 0; pointer-events: none; }
   #respuestaPantalla:not(:empty) { opacity: 1; }
 
   /* ── Action buttons ── */
   .action-btns {
-    display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
-    margin-bottom: 18px;
+    display: flex; justify-content: center; gap: 8px;
+    flex-wrap: wrap; margin-bottom: 14px;
   }
   .btn {
-    padding: 14px 26px; border: none; border-radius: 14px;
+    padding: 13px 18px; border: none; border-radius: 12px;
     font-family: 'Nunito', sans-serif; font-weight: 900;
-    font-size: 1rem; cursor: pointer;
-    transition: all 0.2s;
-    display: flex; align-items: center; gap: 8px;
-    letter-spacing: 0.5px;
+    font-size: clamp(0.82rem, 2.4vw, 1rem);
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+    letter-spacing: 0.3px;
+    min-height: 48px; /* touch target mínimo */
+    white-space: nowrap;
+    flex: 1;
+    max-width: 160px;
+    justify-content: center;
   }
   .btn:active { transform: scale(0.95); }
-  .btn-green { background: linear-gradient(135deg, #00E676, #00C853); color: #0a1200; box-shadow: 0 6px 24px rgba(0,230,118,0.35); }
-  .btn-red   { background: linear-gradient(135deg, #FF1744, #D50000); color: #fff;    box-shadow: 0 6px 24px rgba(255,23,68,0.35); }
-  .btn-yellow{ background: linear-gradient(135deg, #FFD600, #FF8F00); color: #1a0a00; box-shadow: 0 6px 24px rgba(255,214,0,0.35); }
-  .btn-blue  { background: linear-gradient(135deg, #2979FF, #1565C0); color: #fff;    box-shadow: 0 6px 24px rgba(41,121,255,0.35); }
-  .btn-disabled { opacity: 0.4; pointer-events: none; }
+  .btn-green  { background: linear-gradient(135deg, #00E676, #00C853); color: #0a1200; box-shadow: 0 4px 18px rgba(0,230,118,0.35); }
+  .btn-red    { background: linear-gradient(135deg, #FF1744, #D50000); color: #fff;    box-shadow: 0 4px 18px rgba(255,23,68,0.35); }
+  .btn-yellow { background: linear-gradient(135deg, #FFD600, #FF8F00); color: #1a0a00; box-shadow: 0 4px 18px rgba(255,214,0,0.35); }
+  .btn-blue   { background: linear-gradient(135deg, #2979FF, #1565C0); color: #fff;    box-shadow: 0 4px 18px rgba(41,121,255,0.35); }
+  .btn-disabled { opacity: 0.38; pointer-events: none; }
 
   /* ── Start screen ── */
-  .start-screen {
-    text-align: center; padding: 30px 0 10px;
-  }
-  .start-screen .big-number {
-    font-family: 'Bebas Neue', cursive;
-    font-size: 8rem;
-    color: var(--gold);
-    text-shadow: var(--glow-gold);
-    line-height: 1;
-    display: none;
-  }
+  .start-screen { text-align: center; padding: 24px 0 8px; }
   .time-control {
-    display: flex; align-items: center; justify-content: center; gap: 14px;
-    margin-bottom: 28px;
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    margin-bottom: 24px; flex-wrap: wrap;
   }
-  .time-control label { font-weight: 700; color: rgba(255,255,255,0.7); font-size: 1rem; }
+  .time-control label { font-weight: 700; color: rgba(255,255,255,0.7); font-size: clamp(0.85rem, 2.5vw, 1rem); }
   .time-control input {
     width: 90px; padding: 10px 14px;
     background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
     border-radius: 10px; color: #fff; font-size: 1.1rem; font-weight: 700;
-    text-align: center;
+    text-align: center; min-height: 44px;
   }
 
   /* ── Pass queue indicator ── */
   .pass-queue {
     background: rgba(255,214,0,0.08);
     border: 1px solid rgba(255,214,0,0.2);
-    border-radius: 14px; padding: 10px 18px;
-    margin-bottom: 14px; font-size: 0.9rem;
+    border-radius: 12px; padding: 8px 14px;
+    margin-bottom: 10px;
+    font-size: clamp(0.78rem, 2.2vw, 0.88rem);
     color: var(--yellow);
     display: none;
+    word-break: break-word;
   }
   .pass-queue.visible { display: block; }
 
@@ -294,7 +289,7 @@
     background: rgba(0,0,0,0.85);
     backdrop-filter: blur(10px);
     display: flex; align-items: center; justify-content: center;
-    padding: 20px;
+    padding: 16px;
     opacity: 0; pointer-events: none;
     transition: opacity 0.4s;
   }
@@ -302,68 +297,79 @@
   .modal {
     background: linear-gradient(145deg, #0d0d24, #16162e);
     border: 1px solid rgba(255,215,0,0.3);
-    border-radius: 28px; padding: 40px 50px;
-    text-align: center; max-width: 440px; width: 100%;
+    border-radius: 24px;
+    padding: clamp(24px, 5vw, 40px) clamp(20px, 6vw, 50px);
+    text-align: center;
+    max-width: 420px; width: 100%;
     box-shadow: 0 0 80px rgba(255,45,120,0.3), 0 0 40px rgba(255,215,0,0.2);
     transform: scale(0.9);
     transition: transform 0.4s cubic-bezier(.34,1.56,.64,1);
+    max-height: 90vh;
+    overflow-y: auto;
   }
   .modal-overlay.visible .modal { transform: scale(1); }
   .modal h2 {
     font-family: 'Bebas Neue', cursive;
-    font-size: 3rem; letter-spacing: 3px;
+    font-size: clamp(2rem, 7vw, 3rem);
+    letter-spacing: 3px;
     background: linear-gradient(135deg, var(--gold), var(--hot));
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    margin-bottom: 28px;
+    margin-bottom: 22px;
   }
   .modal-scores {
-    display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;
-    margin-bottom: 32px;
+    display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 24px;
   }
   .modal-score-item {
     display: flex; flex-direction: column; align-items: center; gap: 4px;
-    padding: 16px 24px; border-radius: 18px;
-    backdrop-filter: blur(10px);
+    padding: clamp(12px, 3vw, 16px) clamp(16px, 4vw, 24px);
+    border-radius: 16px; backdrop-filter: blur(10px);
+    flex: 1; min-width: 80px;
   }
-  .modal-score-item .num {
-    font-family: 'Bebas Neue', cursive; font-size: 3.5rem; line-height: 1;
-  }
-  .modal-score-item .lbl { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
-  .modal-score-item.g { background: rgba(0,230,118,0.15); color: var(--green); }
-  .modal-score-item.r { background: rgba(255,23,68,0.15);  color: var(--red); }
-  .modal-score-item.y { background: rgba(255,214,0,0.15);  color: var(--yellow); }
+  .modal-score-item .num  { font-family: 'Bebas Neue', cursive; font-size: clamp(2.5rem, 8vw, 3.5rem); line-height: 1; }
+  .modal-score-item .lbl  { font-size: clamp(0.68rem, 2vw, 0.8rem); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
+  .modal-score-item.g     { background: rgba(0,230,118,0.15); color: var(--green); }
+  .modal-score-item.r     { background: rgba(255,23,68,0.15);  color: var(--red); }
+  .modal-score-item.y     { background: rgba(255,214,0,0.15);  color: var(--yellow); }
+  #finMensaje             { font-size: clamp(0.95rem, 3vw, 1.15rem); margin-bottom: 22px; color: rgba(255,255,255,0.85); line-height: 1.5; }
+  .btn-replay             { width: 100%; justify-content: center; font-size: clamp(0.95rem, 3vw, 1.1rem); max-width: none; }
 
   /* ── Config tab ── */
-  .config-panel { padding: 10px 0; }
+  .config-panel { padding: 6px 0; }
   .config-panel h2 {
     font-family: 'Bebas Neue', cursive;
-    font-size: 1.8rem; letter-spacing: 2px; color: var(--gold);
-    margin-bottom: 16px;
+    font-size: clamp(1.4rem, 5vw, 1.8rem);
+    letter-spacing: 2px; color: var(--gold);
+    margin-bottom: 14px;
   }
   .config-row {
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 14px; padding: 12px 16px;
-    margin-bottom: 10px;
-    display: grid; grid-template-columns: 40px auto; gap: 10px; align-items: start;
+    border-radius: 12px; padding: 10px 12px;
+    margin-bottom: 8px;
+    display: grid; grid-template-columns: 36px auto; gap: 8px; align-items: start;
   }
   .config-letter {
-    font-family: 'Bebas Neue', cursive; font-size: 1.8rem;
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(1.4rem, 4vw, 1.8rem);
     color: var(--gold); line-height: 1; padding-top: 6px;
   }
-  .config-fields { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .config-fields { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
   .config-fields select, .config-fields input {
-    padding: 7px 12px;
+    padding: 7px 10px;
     background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 9px; color: #fff; font-family: 'Nunito', sans-serif;
-    font-size: 0.9rem;
+    border-radius: 8px; color: #fff; font-family: 'Nunito', sans-serif;
+    font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+    min-height: 40px;
   }
-  .config-fields input[type="text"] { flex: 1; min-width: 150px; }
-  .config-fields input.resp { width: 150px; }
+  .config-fields input[type="text"] { flex: 1; min-width: 130px; }
+  .config-fields input.resp         { width: 130px; }
   .btn-sm {
-    padding: 7px 14px; border-radius: 9px; border: none;
-    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.82rem;
+    padding: 7px 12px; border-radius: 8px; border: none;
+    font-family: 'Nunito', sans-serif; font-weight: 700;
+    font-size: clamp(0.75rem, 2vw, 0.82rem);
     cursor: pointer; transition: all 0.2s;
+    min-height: 36px; white-space: nowrap;
   }
   .btn-sm:active { transform: scale(0.95); }
   .btn-save { background: rgba(0,230,118,0.2); color: var(--green); border: 1px solid rgba(0,230,118,0.4); }
@@ -382,7 +388,8 @@
   #countdownOverlay.visible { opacity: 1; pointer-events: all; }
   #countdownNum {
     font-family: 'Bebas Neue', cursive;
-    font-size: 15rem; line-height: 1;
+    font-size: clamp(8rem, 30vw, 15rem);
+    line-height: 1;
     background: linear-gradient(135deg, var(--gold), var(--hot));
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     animation: countPop 1s ease-in-out;
@@ -395,15 +402,42 @@
   }
   #countdownLabel {
     font-family: 'Bebas Neue', cursive;
-    font-size: 2rem; letter-spacing: 6px; color: rgba(255,255,255,0.6);
-    margin-top: -20px;
+    font-size: clamp(1.2rem, 4vw, 2rem);
+    letter-spacing: 6px; color: rgba(255,255,255,0.6);
+    margin-top: -10px;
   }
 
-  /* ── Responsive ── */
-  @media (max-width: 540px) {
-    .action-btns { gap: 8px; }
-    .btn { padding: 12px 16px; font-size: 0.9rem; }
-    .modal { padding: 28px 20px; }
+  /* ── Ajustes específicos para pantallas pequeñas ── */
+  @media (max-width: 400px) {
+    .btn { padding: 11px 12px; gap: 4px; }
+    .score-pill { padding: 6px 10px; gap: 4px; }
+    .action-btns { gap: 6px; }
+  }
+
+  /* ── Landscape móvil: layout en dos columnas ── */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .container { padding-top: 8px; }
+    header { padding: 6px 0; }
+    header h1 { font-size: 1.6rem; }
+    #rosco {
+      --rosco-size: min(300px, 50vw);
+    }
+    #gameScreen {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto;
+      gap: 0 16px;
+      align-items: start;
+    }
+    .scoreboard { margin-bottom: 6px; }
+    .timer-wrap  { margin-bottom: 6px; }
+    #rosco       { grid-row: 1 / 4; grid-column: 1; margin: 0 auto; }
+    .scoreboard  { grid-column: 2; }
+    .timer-wrap  { grid-column: 2; }
+    .pass-queue  { grid-column: 2; }
+    .question-box{ grid-column: 2; min-height: 60px; }
+    #respuestaPantalla { grid-column: 2; }
+    .action-btns { grid-column: 2; }
   }
 </style>
 </head>
@@ -435,8 +469,8 @@
         <span class="lbl">⏩ Pasadas</span>
       </div>
     </div>
-    <p id="finMensaje" style="font-size:1.2rem;margin-bottom:28px;color:rgba(255,255,255,0.8);line-height:1.5;"></p>
-    <button class="btn btn-blue" onclick="resetGame()" style="width:100%;justify-content:center;font-size:1.1rem;">
+    <p id="finMensaje" style="font-size:1.1rem;margin-bottom:22px;color:rgba(255,255,255,0.85);line-height:1.5;"></p>
+    <button class="btn btn-blue btn-replay" onclick="resetGame()">
       🔄 Jugar otra vez
     </button>
   </div>
@@ -461,43 +495,36 @@
         <label for="tiempo">⏱ Tiempo (segundos):</label>
         <input id="tiempo" type="number" value="180" min="30" max="600">
       </div>
-      <button class="btn btn-blue" style="font-size:1.2rem;padding:16px 40px;margin:0 auto;display:block;" onclick="iniciar()">
+      <button class="btn btn-blue" style="font-size:1.1rem;padding:14px 36px;margin:0 auto;display:inline-flex;max-width:220px;" onclick="iniciar()">
         🚀 ¡Empezar!
       </button>
     </div>
 
     <div id="gameScreen" style="display:none;">
-      <!-- Scores -->
       <div class="scoreboard">
-        <div class="score-pill green"><span class="icon">✅</span> <span id="scoreAciertos">0</span></div>
-        <div class="score-pill red">  <span class="icon">❌</span> <span id="scoreErrores">0</span></div>
-        <div class="score-pill yellow"><span class="icon">⏩</span> <span id="scorePasas">0</span></div>
+        <div class="score-pill green"><span class="icon">✅</span><span id="scoreAciertos">0</span></div>
+        <div class="score-pill red">  <span class="icon">❌</span><span id="scoreErrores">0</span></div>
+        <div class="score-pill yellow"><span class="icon">⏩</span><span id="scorePasas">0</span></div>
       </div>
 
-      <!-- Timer -->
       <div class="timer-wrap">
         <span id="timer">180</span>
       </div>
 
-      <!-- Rosco -->
       <div id="rosco"></div>
 
-      <!-- Pass queue info -->
       <div class="pass-queue" id="passQueueInfo"></div>
 
-      <!-- Question -->
       <div class="question-box">
         <div id="pregunta">Pulsa <b>¡Empezar!</b> para comenzar el rosco.</div>
       </div>
 
-      <!-- Answer reveal -->
       <div id="respuestaPantalla"></div>
 
-      <!-- Buttons -->
       <div class="action-btns">
-        <button class="btn btn-green" id="btnAcierto" onclick="marcar('acierto')">✅ Acierto</button>
-        <button class="btn btn-red"   id="btnError"   onclick="marcar('error')">❌ Error</button>
-        <button class="btn btn-yellow" id="btnPasa"   onclick="pasapalabra()">⏩ Pasapalabra</button>
+        <button class="btn btn-green"  id="btnAcierto" onclick="marcar('acierto')">✅ Acierto</button>
+        <button class="btn btn-red"    id="btnError"   onclick="marcar('error')">❌ Error</button>
+        <button class="btn btn-yellow" id="btnPasa"    onclick="pasapalabra()">⏩ Pasa</button>
       </div>
     </div>
 
@@ -513,7 +540,7 @@
 </div>
 
 <script>
-// ── Sonidos (Web Audio API – sin dependencias externas) ──────────────────────
+// ── Sonidos ──────────────────────────────────────────────────────────────────
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
 function getAudioCtx() { if (!audioCtx) audioCtx = new AudioCtx(); return audioCtx; }
@@ -544,24 +571,19 @@ function soundPasa() {
   playTone(440, 0.08, 'square', 0.15);
   setTimeout(()=>playTone(392, 0.08, 'square', 0.15), 90);
 }
-function soundCountdown() {
-  playTone(660, 0.15, 'triangle', 0.25);
-}
+function soundCountdown() { playTone(660, 0.15, 'triangle', 0.25); }
 function soundGo() {
   playTone(784, 0.1, 'triangle', 0.3);
-  setTimeout(()=>playTone(988, 0.1, 'triangle', 0.3), 100);
-  setTimeout(()=>playTone(1175,0.2, 'triangle', 0.3), 200);
+  setTimeout(()=>playTone(988,  0.1, 'triangle', 0.3), 100);
+  setTimeout(()=>playTone(1175, 0.2, 'triangle', 0.3), 200);
 }
 
 // ── Confeti ──────────────────────────────────────────────────────────────────
 const canvas = document.getElementById('confeti');
-const ctx = canvas.getContext('2d');
+const ctx2d = canvas.getContext('2d');
 let particles = [];
 
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
@@ -571,29 +593,29 @@ function burst(x, y, count=100) {
     const speed = Math.random() * 9 + 2;
     particles.push({
       x, y,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed - 5,
+      vx: Math.cos(angle)*speed,
+      vy: Math.sin(angle)*speed - 5,
       alpha: 1,
       color: `hsl(${Math.random()*360},100%,55%)`,
-      size: Math.random() * 7 + 3,
-      rot: Math.random() * 360,
-      rotV: (Math.random() - 0.5) * 10,
+      size: Math.random()*7+3,
+      rot: Math.random()*360,
+      rotV: (Math.random()-0.5)*10,
       shape: Math.random() > 0.5 ? 'rect' : 'circle'
     });
   }
 }
 
 function drawConfeti() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx2d.clearRect(0, 0, canvas.width, canvas.height);
   for (let p of particles) {
-    ctx.save();
-    ctx.translate(p.x, p.y);
-    ctx.rotate(p.rot * Math.PI / 180);
-    ctx.globalAlpha = p.alpha;
-    ctx.fillStyle = p.color;
-    if (p.shape === 'rect') ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size * 0.5);
-    else { ctx.beginPath(); ctx.arc(0, 0, p.size/2, 0, Math.PI*2); ctx.fill(); }
-    ctx.restore();
+    ctx2d.save();
+    ctx2d.translate(p.x, p.y);
+    ctx2d.rotate(p.rot * Math.PI/180);
+    ctx2d.globalAlpha = p.alpha;
+    ctx2d.fillStyle = p.color;
+    if (p.shape === 'rect') ctx2d.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.5);
+    else { ctx2d.beginPath(); ctx2d.arc(0,0,p.size/2,0,Math.PI*2); ctx2d.fill(); }
+    ctx2d.restore();
     p.x += p.vx; p.y += p.vy;
     p.vy += 0.25; p.vx *= 0.99;
     p.alpha -= 0.013;
@@ -616,33 +638,33 @@ function hablar(texto) {
 const LETRAS = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ".split("");
 
 let preguntas = [
-  {letra:"A", tipo:"empieza",  respuesta:"Ahorrar",          pista:"Lo que prometes hacer con el dinero… pero nunca haces."},
-  {letra:"B", tipo:"contiene", respuesta:"Bizum",             pista:"Aplicación que te salva cuando te quedas sin efectivo."},
-  {letra:"C", tipo:"empieza",  respuesta:"Coche",             pista:"Medio de transporte que quieres tener a los 18."},
-  {letra:"D", tipo:"empieza",  respuesta:"DNI",               pista:"Documento nacional de identidad que ya puedes tener."},
-  {letra:"E", tipo:"contiene", respuesta:"Educación",         pista:"Lo que dicen tus padres que debes tener ahora."},
-  {letra:"F", tipo:"empieza",  respuesta:"Fiesta",            pista:"Lo que haces los fines de semana."},
-  {letra:"G", tipo:"empieza",  respuesta:"Grupo",             pista:"Personas con las que sales los fines de semana."},
-  {letra:"H", tipo:"empieza",  respuesta:"Horario",           pista:"Lo que necesitas para organizar tu día."},
-  {letra:"I", tipo:"empieza",  respuesta:"Independencia",     pista:"Lo que quieres tener cuando cumples 18."},
-  {letra:"J", tipo:"empieza",  respuesta:"Juerga",            pista:"Lo que algunos montan después de tres copas."},
-  {letra:"K", tipo:"contiene", respuesta:"Karaoke",           pista:"Contiene la K: actividad donde cantas aunque no sepas."},
-  {letra:"L", tipo:"empieza",  respuesta:"Luz",               pista:"Lo que sube en la factura cuando enciendes muchas cosas."},
-  {letra:"M", tipo:"empieza",  respuesta:"Mareo",             pista:"Lo que te queda después de una gran fiesta."},
-  {letra:"N", tipo:"empieza",  respuesta:"Niño",              pista:"Lo que dicen tus padres que sigues siendo."},
-  {letra:"Ñ", tipo:"contiene", respuesta:"Enseñar",           pista:"Contiene la Ñ: acción de transmitir conocimientos."},
-  {letra:"O", tipo:"empieza",  respuesta:"Ocio",              pista:"Tiempo libre fuera del trabajo o estudios."},
-  {letra:"P", tipo:"empieza",  respuesta:"Pinta",             pista:"La bebida que prometes que será 'solo una'."},
-  {letra:"Q", tipo:"empieza",  respuesta:"Queja",             pista:"Lo que expresas cuando algo no te gusta."},
-  {letra:"R", tipo:"empieza",  respuesta:"Responsabilidad",   pista:"Capacidad de asumir tus obligaciones."},
-  {letra:"S", tipo:"empieza",  respuesta:"Sueño",             pista:"Lo que tienes todo el día después de una noche de fiesta."},
-  {letra:"T", tipo:"empieza",  respuesta:"Trabajo",           pista:"Actividad remunerada que todos esperan que consigas."},
-  {letra:"U", tipo:"empieza",  respuesta:"Universidad",       pista:"Lugar donde muchos dicen que van a estudiar… y a salir."},
-  {letra:"V", tipo:"empieza",  respuesta:"Votar",             pista:"Derecho político que ya puedes ejercer a los 18."},
-  {letra:"W", tipo:"empieza",  respuesta:"Wifi",              pista:"Lo primero que preguntas al llegar a cualquier sitio."},
-  {letra:"X", tipo:"contiene", respuesta:"Excusa",            pista:"Contiene la X: explicación que das cuando te equivocas."},
-  {letra:"Y", tipo:"contiene", respuesta:"Mayor",             pista:"Contiene la Y: ya lo eres desde hoy."},
-  {letra:"Z", tipo:"empieza",  respuesta:"Zombie",            pista:"En lo que te conviertes la mañana después de la fiesta."}
+  {letra:"A", tipo:"empieza",  respuesta:"Ahorrar",        pista:"Lo que prometes hacer con el dinero… pero nunca haces."},
+  {letra:"B", tipo:"contiene", respuesta:"Bizum",           pista:"Aplicación que te salva cuando te quedas sin efectivo."},
+  {letra:"C", tipo:"empieza",  respuesta:"Coche",           pista:"Medio de transporte que quieres tener a los 18."},
+  {letra:"D", tipo:"empieza",  respuesta:"DNI",             pista:"Documento nacional de identidad que ya puedes tener."},
+  {letra:"E", tipo:"contiene", respuesta:"Educación",       pista:"Lo que dicen tus padres que debes tener ahora."},
+  {letra:"F", tipo:"empieza",  respuesta:"Fiesta",          pista:"Lo que haces los fines de semana."},
+  {letra:"G", tipo:"empieza",  respuesta:"Grupo",           pista:"Personas con las que sales los fines de semana."},
+  {letra:"H", tipo:"empieza",  respuesta:"Horario",         pista:"Lo que necesitas para organizar tu día."},
+  {letra:"I", tipo:"empieza",  respuesta:"Independencia",   pista:"Lo que quieres tener cuando cumples 18."},
+  {letra:"J", tipo:"empieza",  respuesta:"Juerga",          pista:"Lo que algunos montan después de tres copas."},
+  {letra:"K", tipo:"contiene", respuesta:"Karaoke",         pista:"Contiene la K: actividad donde cantas aunque no sepas."},
+  {letra:"L", tipo:"empieza",  respuesta:"Luz",             pista:"Lo que sube en la factura cuando enciendes muchas cosas."},
+  {letra:"M", tipo:"empieza",  respuesta:"Mareo",           pista:"Lo que te queda después de una gran fiesta."},
+  {letra:"N", tipo:"empieza",  respuesta:"Niño",            pista:"Lo que dicen tus padres que sigues siendo."},
+  {letra:"Ñ", tipo:"contiene", respuesta:"Enseñar",         pista:"Contiene la Ñ: acción de transmitir conocimientos."},
+  {letra:"O", tipo:"empieza",  respuesta:"Ocio",            pista:"Tiempo libre fuera del trabajo o estudios."},
+  {letra:"P", tipo:"empieza",  respuesta:"Pinta",           pista:"La bebida que prometes que será 'solo una'."},
+  {letra:"Q", tipo:"empieza",  respuesta:"Queja",           pista:"Lo que expresas cuando algo no te gusta."},
+  {letra:"R", tipo:"empieza",  respuesta:"Responsabilidad", pista:"Capacidad de asumir tus obligaciones."},
+  {letra:"S", tipo:"empieza",  respuesta:"Sueño",           pista:"Lo que tienes todo el día después de una noche de fiesta."},
+  {letra:"T", tipo:"empieza",  respuesta:"Trabajo",         pista:"Actividad remunerada que todos esperan que consigas."},
+  {letra:"U", tipo:"empieza",  respuesta:"Universidad",     pista:"Lugar donde muchos dicen que van a estudiar… y a salir."},
+  {letra:"V", tipo:"empieza",  respuesta:"Votar",           pista:"Derecho político que ya puedes ejercer a los 18."},
+  {letra:"W", tipo:"empieza",  respuesta:"Wifi",            pista:"Lo primero que preguntas al llegar a cualquier sitio."},
+  {letra:"X", tipo:"contiene", respuesta:"Excusa",          pista:"Contiene la X: explicación que das cuando te equivocas."},
+  {letra:"Y", tipo:"contiene", respuesta:"Mayor",           pista:"Contiene la Y: ya lo eres desde hoy."},
+  {letra:"Z", tipo:"empieza",  respuesta:"Zombie",          pista:"En lo que te conviertes la mañana después de la fiesta."}
 ];
 
 // ── Estado del juego ──────────────────────────────────────────────────────────
@@ -650,24 +672,27 @@ let indice = 0;
 let tiempoRestante = 0;
 let intervalo = null;
 let bloqueado = false;
-let letrasCompletadas = new Set(); // aciertos + errores
-let letrasEnCola = [];             // pendientes de responder
-let vueltas = 0;                   // cuántas veces ha dado la vuelta el rosco
-let resultados = { aciertos: 0, errores: 0, pasapalabras: 0 };
+let letrasCompletadas = new Set();
+let letrasEnCola = [];
+let vueltas = 0;
+let resultados = { aciertos:0, errores:0, pasapalabras:0 };
 let juegoActivo = false;
 
 // ── Rosco ─────────────────────────────────────────────────────────────────────
 function crearRosco() {
   const rosco = document.getElementById('rosco');
   rosco.innerHTML = '';
-  const tam = rosco.offsetWidth || 520;
+  
+  // Obtener el tamaño real del contenedor
+  const tam = rosco.offsetWidth || parseInt(getComputedStyle(document.documentElement).getPropertyValue('--rosco-size')) || 480;
+  const letraSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--letra-size')) || 38;
   const centro = tam / 2;
-  const radio = tam / 2 - tam * 0.09;
+  const radio  = tam / 2 - letraSize * 0.6;
 
   LETRAS.forEach((l, i) => {
     const angulo = (i / LETRAS.length) * 2 * Math.PI - Math.PI / 2;
-    const x = centro + radio * Math.cos(angulo) - (tam * 0.04);
-    const y = centro + radio * Math.sin(angulo) - (tam * 0.04);
+    const x = centro + radio * Math.cos(angulo) - letraSize / 2;
+    const y = centro + radio * Math.sin(angulo) - letraSize / 2;
     const div = document.createElement('div');
     div.className = 'letra';
     div.id = 'l' + i;
@@ -688,6 +713,7 @@ function abrirTab(id, btn) {
   document.getElementById(id).classList.add('active');
   btn.classList.add('active');
   if (id === 'config') crearConfig();
+  if (id === 'juego') setTimeout(crearRosco, 50);
 }
 
 // ── Countdown overlay ─────────────────────────────────────────────────────────
@@ -697,14 +723,12 @@ function mostrarCountdown(callback) {
   const lbl     = document.getElementById('countdownLabel');
   overlay.classList.add('visible');
   let cnt = 3;
-
   function step() {
     if (cnt > 0) {
       numEl.textContent = cnt;
-      lbl.textContent = cnt === 3 ? 'PREPARADOS' : cnt === 2 ? 'LISTOS' : '¡YA!';
-      // Re-trigger animation
+      lbl.textContent = cnt===3 ? 'PREPARADOS' : cnt===2 ? 'LISTOS' : '¡YA!';
       numEl.style.animation = 'none';
-      numEl.offsetHeight; // reflow
+      numEl.offsetHeight;
       numEl.style.animation = 'countPop 1s ease-in-out';
       soundCountdown();
       cnt--;
@@ -720,42 +744,28 @@ function mostrarCountdown(callback) {
 
 // ── Iniciar juego ─────────────────────────────────────────────────────────────
 function iniciar() {
-  // Resume AudioContext on first interaction
   if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-
   document.getElementById('startScreen').style.display = 'none';
-  document.getElementById('gameScreen').style.display = 'block';
-
-  mostrarCountdown(comenzar);
+  document.getElementById('gameScreen').style.display  = 'block';
+  // Regenerar rosco con dimensiones correctas tras mostrar el gameScreen
+  setTimeout(() => { crearRosco(); mostrarCountdown(comenzar); }, 50);
 }
 
 function comenzar() {
-  // Reset state
-  indice = 0;
-  bloqueado = false;
-  letrasCompletadas = new Set();
-  letrasEnCola = [];
-  vueltas = 0;
-  resultados = { aciertos: 0, errores: 0, pasapalabras: 0 };
+  indice = 0; bloqueado = false;
+  letrasCompletadas = new Set(); letrasEnCola = []; vueltas = 0;
+  resultados = { aciertos:0, errores:0, pasapalabras:0 };
   juegoActivo = true;
-
-  // Reset rosco visual
-  document.querySelectorAll('.letra').forEach(l => {
-    l.className = 'letra';
-  });
-
+  document.querySelectorAll('.letra').forEach(l => l.className = 'letra');
   actualizarScoreboard();
-
   tiempoRestante = parseInt(document.getElementById('tiempo').value) || 180;
   actualizarTimer();
-
   clearInterval(intervalo);
   intervalo = setInterval(() => {
     tiempoRestante--;
     actualizarTimer();
     if (tiempoRestante <= 0) { clearInterval(intervalo); finJuego(); }
   }, 1000);
-
   mostrarPregunta();
 }
 
@@ -772,41 +782,27 @@ function actualizarScoreboard() {
 }
 
 // ── Lógica del rosco ──────────────────────────────────────────────────────────
-function obtenerPregunta(letra) {
-  return preguntas.find(p => p.letra === letra);
-}
+function obtenerPregunta(letra) { return preguntas.find(p => p.letra === letra); }
 
 function siguienteIndice() {
-  // Busca la siguiente letra no completada
   let intentos = 0;
   do {
     indice = (indice + 1) % LETRAS.length;
     if (indice === 0) vueltas++;
     intentos++;
-    if (intentos > LETRAS.length) {
-      // Todas completadas
-      finJuego();
-      return false;
-    }
+    if (intentos > LETRAS.length) { finJuego(); return false; }
   } while (letrasCompletadas.has(LETRAS[indice]));
   return true;
 }
 
 function mostrarPregunta() {
-  // Actualizar cola de pasapalabras
   actualizarColaPasa();
-
-  // Resaltar letra activa
   document.querySelectorAll('.letra').forEach(l => l.classList.remove('activa'));
   document.getElementById('l' + indice).classList.add('activa');
-
   const letra = LETRAS[indice];
   const q = obtenerPregunta(letra);
-
-  let texto;
   if (!q) {
-    texto = `No hay pregunta configurada para la letra <b>${letra}</b>.`;
-    document.getElementById('pregunta').innerHTML = texto;
+    document.getElementById('pregunta').innerHTML = `No hay pregunta para la letra <b>${letra}</b>.`;
     hablar('Letra ' + letra + '. Sin pregunta.');
   } else {
     const tipoTexto = q.tipo === 'empieza' ? 'Empieza por' : 'Contiene la letra';
@@ -814,23 +810,22 @@ function mostrarPregunta() {
       `<span class="tipo-badge">${tipoTexto} ${letra}</span>${q.pista}`;
     hablar(`Letra ${letra}. ${tipoTexto} ${letra}. ${q.pista}`);
   }
-
   document.getElementById('respuestaPantalla').textContent = '';
   setBotonesActivos(true);
   bloqueado = false;
 }
 
 function setBotonesActivos(activo) {
-  ['btnAcierto','btnError','btnPasa'].forEach(id => {
-    document.getElementById(id).classList.toggle('btn-disabled', !activo);
-  });
+  ['btnAcierto','btnError','btnPasa'].forEach(id =>
+    document.getElementById(id).classList.toggle('btn-disabled', !activo)
+  );
 }
 
 function actualizarColaPasa() {
   const el = document.getElementById('passQueueInfo');
   const pendientes = LETRAS.filter(l => letrasEnCola.includes(l));
   if (pendientes.length > 0) {
-    el.textContent = `⏩ Letras pendientes de responder: ${pendientes.join(' · ')}`;
+    el.textContent = `⏩ Pendientes: ${pendientes.join(' · ')}`;
     el.classList.add('visible');
   } else {
     el.classList.remove('visible');
@@ -840,98 +835,55 @@ function actualizarColaPasa() {
 // ── Acciones ──────────────────────────────────────────────────────────────────
 function marcar(tipo) {
   if (bloqueado || !juegoActivo) return;
-  bloqueado = true;
-  setBotonesActivos(false);
-
+  bloqueado = true; setBotonesActivos(false);
   const letra = LETRAS[indice];
   const q = obtenerPregunta(letra);
-
-  // Mostrar respuesta
-  document.getElementById('respuestaPantalla').textContent =
-    '💡 Respuesta: ' + (q ? q.respuesta : 'N/A');
-
+  document.getElementById('respuestaPantalla').textContent = '💡 Respuesta: ' + (q ? q.respuesta : 'N/A');
   const elLetra = document.getElementById('l' + indice);
-
   if (tipo === 'acierto') {
-    elLetra.classList.remove('activa', 'pasada');
-    elLetra.classList.add('acierto');
+    elLetra.classList.remove('activa','pasada'); elLetra.classList.add('acierto');
     soundAcierto();
-    burst(window.innerWidth / 2, window.innerHeight * 0.35);
+    burst(window.innerWidth/2, window.innerHeight*0.35);
     resultados.aciertos++;
     letrasCompletadas.add(letra);
-    // Quitar de la cola si estaba
     letrasEnCola = letrasEnCola.filter(l => l !== letra);
   } else {
-    elLetra.classList.remove('activa', 'pasada');
-    elLetra.classList.add('error');
+    elLetra.classList.remove('activa','pasada'); elLetra.classList.add('error');
     soundError();
     resultados.errores++;
     letrasCompletadas.add(letra);
     letrasEnCola = letrasEnCola.filter(l => l !== letra);
   }
-
   actualizarScoreboard();
-
-  // Comprobar si quedan letras
   const faltantes = LETRAS.filter(l => !letrasCompletadas.has(l));
-  if (faltantes.length === 0) {
-    setTimeout(finJuego, 1200);
-    return;
-  }
-
-  setTimeout(() => {
-    if (siguienteIndice()) mostrarPregunta();
-  }, 1400);
+  if (faltantes.length === 0) { setTimeout(finJuego, 1200); return; }
+  setTimeout(() => { if (siguienteIndice()) mostrarPregunta(); }, 1400);
 }
 
 function pasapalabra() {
   if (bloqueado || !juegoActivo) return;
-  bloqueado = true;
-  setBotonesActivos(false);
-
+  bloqueado = true; setBotonesActivos(false);
   const letra = LETRAS[indice];
-  soundPasa();
-  resultados.pasapalabras++;
-  actualizarScoreboard();
-
-  // Marcar la letra como "pasada" visualmente
+  soundPasa(); resultados.pasapalabras++; actualizarScoreboard();
   const elLetra = document.getElementById('l' + indice);
-  elLetra.classList.remove('activa');
-  elLetra.classList.add('pasada');
-
-  // Añadir a cola solo si no está ya
+  elLetra.classList.remove('activa'); elLetra.classList.add('pasada');
   if (!letrasEnCola.includes(letra)) letrasEnCola.push(letra);
-
   document.getElementById('respuestaPantalla').textContent = '';
-
   const faltantes = LETRAS.filter(l => !letrasCompletadas.has(l));
   if (faltantes.length === 0) { setTimeout(finJuego, 800); return; }
-
-  setTimeout(() => {
-    if (siguienteIndice()) mostrarPregunta();
-  }, 600);
+  setTimeout(() => { if (siguienteIndice()) mostrarPregunta(); }, 600);
 }
 
 // ── Fin de juego ──────────────────────────────────────────────────────────────
 function finJuego() {
-  clearInterval(intervalo);
-  juegoActivo = false;
-  bloqueado = true;
-  setBotonesActivos(false);
-  speechSynthesis.cancel();
-
-  // Confeti final
+  clearInterval(intervalo); juegoActivo = false; bloqueado = true;
+  setBotonesActivos(false); speechSynthesis.cancel();
   for (let i = 0; i < 5; i++) {
-    setTimeout(() => {
-      burst(Math.random() * window.innerWidth, Math.random() * window.innerHeight * 0.5, 60);
-    }, i * 300);
+    setTimeout(() => burst(Math.random()*window.innerWidth, Math.random()*window.innerHeight*0.5, 60), i*300);
   }
-
-  document.getElementById('finAciertos').textContent    = resultados.aciertos;
-  document.getElementById('finErrores').textContent     = resultados.errores;
+  document.getElementById('finAciertos').textContent     = resultados.aciertos;
+  document.getElementById('finErrores').textContent      = resultados.errores;
   document.getElementById('finPasapalabras').textContent = resultados.pasapalabras;
-
-  const total = resultados.aciertos + resultados.errores;
   let msg;
   if (resultados.aciertos === LETRAS.length) msg = "🏆 ¡ROSCO COMPLETO! ¡Increíble, David!";
   else if (resultados.aciertos >= 20) msg = "🔥 ¡Brutal! ¡Casi lo borras entero!";
@@ -939,7 +891,6 @@ function finJuego() {
   else if (resultados.aciertos >= 8)  msg = "😅 No está mal… ¡pero puedes mejorar!";
   else msg = "🤣 Tranquilo, habrá revancha…";
   document.getElementById('finMensaje').textContent = msg;
-
   document.getElementById('modalFin').classList.add('visible');
   hablar(msg.replace(/[🏆🔥👏😅🤣]/g, ''));
 }
@@ -953,8 +904,7 @@ function resetGame() {
   document.getElementById('timer').textContent = '';
   document.getElementById('passQueueInfo').classList.remove('visible');
   document.querySelectorAll('.letra').forEach(l => l.className = 'letra');
-  clearInterval(intervalo);
-  juegoActivo = false;
+  clearInterval(intervalo); juegoActivo = false;
   actualizarScoreboard();
 }
 
@@ -963,7 +913,7 @@ function crearConfig() {
   const div = document.getElementById('configuracionLetra');
   div.innerHTML = '';
   LETRAS.forEach(l => {
-    const q = obtenerPregunta(l) || { letra: l, tipo: 'empieza', pista: '', respuesta: '' };
+    const q = obtenerPregunta(l) || { letra:l, tipo:'empieza', pista:'', respuesta:'' };
     const row = document.createElement('div');
     row.className = 'config-row';
     row.innerHTML = `
@@ -973,7 +923,7 @@ function crearConfig() {
           <option value="empieza">Empieza por</option>
           <option value="contiene">Contiene</option>
         </select>
-        <input type="text" id="pista${l}" placeholder="Pista..." value="${q.pista}" style="flex:1;min-width:180px;">
+        <input type="text" id="pista${l}" placeholder="Pista..." value="${q.pista}" style="flex:1;min-width:130px;">
         <input type="text" id="resp${l}"  placeholder="Respuesta..." value="${q.respuesta}" class="resp">
         <button class="btn-sm btn-save" onclick="guardar('${l}')">💾 Guardar</button>
         <button class="btn-sm btn-del"  onclick="eliminar('${l}')">🗑 Borrar</button>
@@ -984,26 +934,24 @@ function crearConfig() {
 }
 
 function guardar(letra) {
-  const tipo     = document.getElementById('tipo' + letra).value;
-  const pista    = document.getElementById('pista' + letra).value;
-  const respuesta = document.getElementById('resp' + letra).value;
+  const tipo      = document.getElementById('tipo'  + letra).value;
+  const pista     = document.getElementById('pista' + letra).value;
+  const respuesta = document.getElementById('resp'  + letra).value;
   const q = obtenerPregunta(letra);
   if (q) { q.tipo = tipo; q.pista = pista; q.respuesta = respuesta; }
-  else { preguntas.push({ letra, tipo, respuesta, pista }); }
-  // Visual feedback
+  else preguntas.push({ letra, tipo, respuesta, pista });
   const btn = event.currentTarget;
   btn.textContent = '✅ Guardado';
   setTimeout(() => btn.textContent = '💾 Guardar', 1500);
 }
 
-function eliminar(letra) {
-  preguntas = preguntas.filter(p => p.letra !== letra);
-  crearConfig();
-}
+function eliminar(letra) { preguntas = preguntas.filter(p => p.letra !== letra); crearConfig(); }
 
-// ── Start ─────────────────────────────────────────────────────────────────────
+// ── Resize ────────────────────────────────────────────────────────────────────
+let resizeTimer;
 window.addEventListener('resize', () => {
-  if (!juegoActivo) crearRosco();
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => { crearRosco(); }, 150);
   resizeCanvas();
 });
 
